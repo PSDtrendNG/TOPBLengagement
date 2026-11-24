@@ -90,16 +90,26 @@
     .paste-target-name { font-weight: 600; color: var(--accent); }
 
     .table-wrap {
-      overflow-x: auto; border-radius: 12px; border: 1px solid var(--border);
-      background: var(--card); box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
       -webkit-overflow-scrolling: touch;
+      max-height: calc(100vh - 180px); /* để sticky hoạt động tốt */
     }
     table { width: 100%; border-collapse: collapse; min-width: 780px; }
-    thead { background: var(--header-bg); }
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--header-bg);
+    }
     th {
       padding: 11px 12px; font-size: 0.8rem; font-weight: 600;
       text-align: center; border-bottom: 1px solid var(--border);
       color: var(--muted); white-space: nowrap;
+      background: var(--header-bg);
     }
     th.group { background: #12141c; color: var(--text); font-size: 0.85rem; }
     th.couple-col { text-align: left; min-width: 190px; }
@@ -165,9 +175,10 @@
       .btn-sm { padding: 4px 7px; font-size: 0.7rem; }
       .note { font-size: 0.8rem; padding: 10px 12px; }
       table { min-width: 680px; }
+      .table-wrap { max-height: calc(100vh - 160px); }
     }
 
-    /* ===== LANDSCAPE (điện thoại xoay ngang – ưu tiên chụp màn hình) ===== */
+    /* ===== LANDSCAPE (điện thoại xoay ngang) ===== */
     @media (orientation: landscape) and (max-height: 500px) {
       body { padding: 6px 8px 12px; }
       header { margin-bottom: 6px; gap: 8px; }
@@ -177,7 +188,7 @@
       .note { display: none; }
       .paste-bar { padding: 6px 10px; margin-bottom: 6px; }
       .paste-bar input { padding: 5px 8px; font-size: 0.8rem; }
-      .table-wrap { border-radius: 8px; }
+      .table-wrap { border-radius: 8px; max-height: calc(100vh - 90px); }
       table { min-width: 0; width: 100%; }
       th { padding: 5px 6px; font-size: 0.7rem; }
       th.couple-col { min-width: 130px; }
@@ -189,13 +200,14 @@
       footer { margin-top: 8px; font-size: 0.7rem; }
     }
 
-    /* Landscape rộng hơn (tablet / phone lớn) */
+    /* Landscape rộng hơn */
     @media (orientation: landscape) and (min-height: 501px) and (max-width: 900px) {
       body { padding: 10px 12px 20px; }
       .note { font-size: 0.8rem; padding: 8px 12px; }
       table { min-width: 0; }
       th, td { padding: 7px 8px; }
       .num-input { width: 80px; }
+      .table-wrap { max-height: calc(100vh - 140px); }
     }
   </style>
 </head>
@@ -568,4 +580,4 @@
     updateTimestamp();
   </script>
 </body>
-</html>
+  </html>
