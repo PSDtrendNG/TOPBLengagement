@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BL Couple Tracker · Talkwalker</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --border: #2a2e3b;
+      --text: #e8eaed;
+      --muted: #9aa0a6;
+      --accent: #8b5cf6;
+      --accent-soft: rgba(139, 92, 246, 0.15);
+      --green: #34d399;
+      --orange: #f59e0b;
+      --red: #f87171;
+      --header-bg: #161922;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+      line-height: 1.45;
+    }
+    .container { max-width: 1120px; margin: 0 auto; }
+    header {
+      display: flex; flex-wrap: wrap; align-items: center;
+      justify-content: space-between; gap: 16px; margin-bottom: 16px;
+    }
+    h1 { font-size: 1.4rem; font-weight: 650; letter-spacing: -0.02em; }
+    h1 span { color: var(--accent); }
+    .meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .updated { font-size: 0.85rem; color: var(--muted); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-size: 0.875rem;
+      font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+    }
+    .btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); background: var(--accent); }
+    .btn-sm { padding: 5px 9px; font-size: 0.75rem; border-radius: 6px; }
+    .btn-paste {
+      background: rgba(52, 211, 153, 0.12);
+      border-color: rgba(52, 211, 153, 0.4);
+      color: var(--green);
+    }
+    .btn-paste:hover { background: rgba(52, 211, 153, 0.22); }
+    .btn-paste.active {
+      background: var(--green); color: #0f1117; border-color: var(--green);
+    }
+
+    .note {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px; font-size: 0.85rem;
+      color: var(--muted); margin-bottom: 16px; line-height: 1.5;
+    }
+    .note strong { color: var(--orange); }
+    .note code { background: #12141c; padding: 1px 5px; border-radius: 4px; font-size: 0.8rem; }
+
+    .paste-bar {
+      display: none;
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .paste-bar.show { display: flex; }
+    .paste-bar input {
+      flex: 1; min-width: 200px;
+      padding: 8px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: #12141c;
+      color: var(--text); font-size: 0.9rem;
+    }
+    .paste-bar input:focus { outline: none; border-color: var(--accent); }
+    .paste-target-name { font-weight: 600; color: var(--accent); }
+
+    .table-wrap {
+      overflow-x: auto; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--card); box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 780px; }
+    thead { background: var(--header-bg); }
+    th {
+      padding: 11px 12px; font-size: 0.8rem; font-weight: 600;
+      text-align: center; border-bottom: 1px solid var(--border);
+      color: var(--muted); white-space: nowrap;
+    }
+    th.group { background: #12141c; color: var(--text); font-size: 0.85rem; }
+    th.couple-col { text-align: left; min-width: 190px; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: var(--accent); }
+    th .sort-icon { opacity: 0.35; margin-left: 3px; font-size: 0.7rem; }
+    th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+
+    td {
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+      text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(139, 92, 246, 0.06); }
+    tbody tr.paste-target { background: rgba(139, 92, 246, 0.15) !important; outline: 2px solid var(--accent); }
+    td.couple { text-align: left; font-weight: 550; }
+    td.couple .hashtag { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
+
+    .num-input {
+      width: 90px; padding: 6px 8px; border-radius: 6px;
+      border: 1px solid var(--border); background: #12141c;
+      color: var(--text); text-align: right; font-size: 0.9rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .num-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+    .num-input::placeholder { color: #555; }
+    .num-input.filled { border-color: rgba(52, 211, 153, 0.5); }
+
+    .rank {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%; font-size: 0.7rem;
+      font-weight: 700; margin-right: 8px; background: var(--border);
+      color: var(--muted); flex-shrink: 0;
+    }
+    .rank.top1 { background: #fbbf24; color: #1a1a1a; }
+    .rank.top2 { background: #94a3b8; color: #1a1a1a; }
+    .rank.top3 { background: #cd7f32; color: #1a1a1a; }
+
+    .actions { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+    .link-tw { color: var(--accent); text-decoration: none; font-size: 0.75rem; }
+    .link-tw:hover { text-decoration: underline; }
+    .highlight-high { color: var(--green); font-weight: 600; }
+
+    footer { margin-top: 18px; font-size: 0.8rem; color: var(--muted); text-align: center; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1a1d27; border: 1px solid var(--green); color: var(--green);
+      padding: 10px 18px; border-radius: 8px; font-size: 0.9rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 9999;
+      opacity: 0; transition: opacity 0.25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 1.2rem; }
+      .num-input { width: 74px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>BL Couple <span>Tracker</span></h1>
+      <div class="meta">
+        <span class="updated" id="lastUpdated">Chưa cập nhật</span>
+        <button class="btn" id="btnSave" title="Lưu số liệu vào trình duyệt">💾 Lưu</button>
+        <button class="btn btn-primary" id="btnRefresh" title="Sắp xếp lại + cập nhật thời gian">↻ Làm mới</button>
+      </div>
+    </header>
+
+    <div class="note">
+      <strong>Cách dùng nhanh:</strong>
+      1) Bấm <b>Mở TW</b> (hoặc tự vào Talkwalker Free Search) → lấy số RESULTS + ENGAGEMENT →
+      2) Quay lại đây bấm nút <b>📋 Dán</b> của đúng cặp → dán (Ctrl+V) → số tự điền vào Results / Engagement.
+      Dữ liệu lưu trong trình duyệt. Bảng tự sắp xếp theo <strong>Engagement 7 day</strong>.
+    </div>
+
+    <!-- Paste bar (hiện khi chọn 1 cặp để dán) -->
+    <div class="paste-bar" id="pasteBar">
+      <span>Dán vào: <span class="paste-target-name" id="pasteTargetName">—</span></span>
+      <input type="text" id="pasteInput" placeholder="Dán text từ Bookmarklet hoặc số Results / Engagement vào đây (Ctrl+V)…" />
+      <button class="btn btn-sm btn-primary" id="btnApplyPaste">Áp dụng</button>
+      <button class="btn btn-sm" id="btnCancelPaste">Hủy</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th rowspan="2" class="couple-col">Couple BL</th>
+            <th colspan="2" class="group">Results</th>
+            <th colspan="2" class="group">Engagement</th>
+            <th rowspan="2" style="min-width:140px">Thao tác</th>
+          </tr>
+          <tr>
+            <th class="sortable" data-col="r1">1 day <span class="sort-icon">▼</span></th>
+            <th class="sortable" data-col="r7">7 day <span class="sort-icon">▼</span></th>
+            <th class="sortable" data-col="e1">1 day <span class="sort-icon">▼</span></th>
+            <th class="sortable sorted" data-col="e7">7 day <span class="sort-icon">▼</span></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <footer>
+      Dữ liệu chỉ lưu trên trình duyệt của bạn · Kết hợp với Bookmarklet TW Grab Metrics để nhập nhanh
+    </footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const COUPLES = [
+      { id: 1,  name: "Perth – Santa",     tag: "#PerthSanta",     q: "%23PerthSanta" },
+      { id: 2,  name: "Teetee – Por",       tag: "#TeeteePor",      q: "%23TeeteePor" },
+      { id: 3,  name: "Keng – Namping",     tag: "#KengNamping",    q: "%23KengNamping" },
+      { id: 4,  name: "Tle – Firstone",     tag: "#TleFirstone",    q: "%23TleFirstone" },
+      { id: 5,  name: "Pond – Phuwin",      tag: "#PondPhuwin",     q: "%23PondPhuwin" },
+      { id: 6,  name: "William – Est",      tag: "#WilliamEst",     q: "%23WilliamEst" },
+      { id: 7,  name: "Gemini – Fourth",    tag: "#GeminiFourth",   q: "%23GeminiFourth" },
+      { id: 8,  name: "Thomas – Kong",      tag: "#ThomasKong",     q: "%23ThomasKong" },
+      { id: 9,  name: "Au – Save",          tag: "#AuSave",         q: "%23AuSave" },
+      { id: 10, name: "Inn – Ongsa",        tag: "#InnOngsa",       q: "%23InnOngsa" },
+      { id: 11, name: "Zee – Nunew",        tag: "#ZeeNunew",       q: "%23ZeeNunew" },
+      { id: 12, name: "Copter – Bank",      tag: "#CopterBank",     q: "%23CopterBank" }
+    ];
+
+    // Free Search không hỗ trợ deep-link ổn định → mở trang chính + copy hashtag
+    const TW_FREE = "https://www.talkwalker.com/social-media-analytics-search";
+
+    let data = {};
+    let sortCol = "e7";
+    let sortDir = "desc";
+    let pasteTargetId = null;
+
+    function parseNum(val) {
+      if (val === "" || val == null) return 0;
+      let s = String(val).replace(/[,\s]/g, "").toUpperCase();
+      const m = s.match(/^([\d.]+)([KMB])?$/);
+      if (!m) {
+        const n = Number(s);
+        return isNaN(n) ? 0 : n;
+      }
+      let v = parseFloat(m[1]);
+      if (m[2] === "K") v *= 1e3;
+      if (m[2] === "M") v *= 1e6;
+      if (m[2] === "B") v *= 1e9;
+      return Math.round(v);
+    }
+
+    function formatDisplay(val) {
+      if (val === "" || val == null) return "";
+      return String(val);
+    }
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem("bl_couple_tracker_v1");
+        if (raw) data = JSON.parse(raw);
+      } catch (e) { data = {}; }
+      COUPLES.forEach(c => {
+        if (!data[c.id]) data[c.id] = { r1: "", r7: "", e1: "", e7: "" };
+      });
+    }
+
+    function collectFromInputs() {
+      COUPLES.forEach(c => {
+        ["r1","r7","e1","e7"].forEach(f => {
+          const el = document.getElementById(`${f}_${c.id}`);
+          if (el) data[c.id][f] = el.value.trim();
+        });
+      });
+    }
+
+    function saveData() {
+      collectFromInputs();
+      localStorage.setItem("bl_couple_tracker_v1", JSON.stringify(data));
+      updateTimestamp(true);
+      showToast("Đã lưu dữ liệu vào trình duyệt");
+    }
+
+    function updateTimestamp(saved = false) {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, "0");
+      const m = String(now.getMinutes()).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      const mo = String(now.getMonth() + 1).padStart(2, "0");
+      document.getElementById("lastUpdated").textContent =
+        (saved ? "Đã lưu lúc " : "Cập nhật lúc ") + `${h}:${m} · ${d}/${mo}`;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
+    function getSortedCouples() {
+      const list = COUPLES.map(c => ({
+        ...c,
+        r1: parseNum(data[c.id]?.r1),
+        r7: parseNum(data[c.id]?.r7),
+        e1: parseNum(data[c.id]?.e1),
+        e7: parseNum(data[c.id]?.e7)
+      }));
+      list.sort((a, b) => {
+        const va = a[sortCol], vb = b[sortCol];
+        return sortDir === "desc" ? vb - va : va - vb;
+      });
+      return list;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      const sorted = getSortedCouples();
+      tbody.innerHTML = "";
+
+      sorted.forEach((c, idx) => {
+        const rankClass = idx === 0 ? "top1" : idx === 1 ? "top2" : idx === 2 ? "top3" : "";
+        const isTarget = pasteTargetId === c.id;
+        const tr = document.createElement("tr");
+        if (isTarget) tr.classList.add("paste-target");
+        tr.innerHTML = `
+          <td class="couple">
+            <span class="rank ${rankClass}">${idx + 1}</span>
+            ${c.name}
+            <span class="hashtag">${c.tag}</span>
+          </td>
+          <td><input class="num-input" id="r1_${c.id}" type="text" inputmode="numeric" placeholder="—" value="${formatDisplay(data[c.id]?.r1)}" data-id="${c.id}" data-field="r1" /></td>
+          <td><input class="num-input" id="r7_${c.id}" type="text" inputmode="numeric" placeholder="—" value="${formatDisplay(data[c.id]?.r7)}" data-id="${c.id}" data-field="r7" /></td>
+          <td><input class="num-input" id="e1_${c.id}" type="text" inputmode="numeric" placeholder="—" value="${formatDisplay(data[c.id]?.e1)}" data-id="${c.id}" data-field="e1" /></td>
+          <td><input class="num-input" id="e7_${c.id}" type="text" inputmode="numeric" placeholder="—" value="${formatDisplay(data[c.id]?.e7)}" data-id="${c.id}" data-field="e7" /></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-sm btn-paste ${isTarget ? 'active' : ''}" data-paste="${c.id}" title="Dán số liệu từ Talkwalker vào hàng này">📋 Dán</button>
+              <button class="btn btn-sm link-tw" data-open-tw="${c.tag}" title="Mở Talkwalker Free Search + copy hashtag">Mở TW</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // highlight highest e7
+      const maxE7 = Math.max(...sorted.map(c => c.e7), 0);
+      if (maxE7 > 0) {
+        sorted.forEach(c => {
+          const input = document.getElementById(`e7_${c.id}`);
+          if (input && parseNum(input.value) === maxE7) input.classList.add("highlight-high");
+          if (input && input.value) input.classList.add("filled");
+        });
+      }
+      // mark filled
+      document.querySelectorAll(".num-input").forEach(inp => {
+        if (inp.value.trim()) inp.classList.add("filled");
+      });
+
+      // bind inputs
+      document.querySelectorAll(".num-input").forEach(inp => {
+        inp.addEventListener("change", e => {
+          data[e.target.dataset.id][e.target.dataset.field] = e.target.value.trim();
+        });
+      });
+
+      // bind paste buttons
+      document.querySelectorAll("[data-paste]").forEach(btn => {
+        btn.addEventListener("click", () => startPasteMode(+btn.dataset.paste));
+      });
+
+      // bind Mở TW buttons
+      document.querySelectorAll("[data-open-tw]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tag = btn.dataset.openTw;
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(tag).then(() => {
+              showToast("Đã copy " + tag + " → đang mở Talkwalker");
+            }).catch(() => {});
+          }
+          window.open("https://www.talkwalker.com/social-media-analytics-search", "_blank");
+        });
+      });
+
+      document.querySelectorAll("th.sortable").forEach(th => {
+        th.classList.toggle("sorted", th.dataset.col === sortCol);
+      });
+    }
+
+    function startPasteMode(id) {
+      pasteTargetId = id;
+      const couple = COUPLES.find(c => c.id === id);
+      document.getElementById("pasteTargetName").textContent = couple ? couple.name : id;
+      document.getElementById("pasteBar").classList.add("show");
+      const input = document.getElementById("pasteInput");
+      input.value = "";
+      input.focus();
+      renderTable(); // highlight row
+    }
+
+    function cancelPasteMode() {
+      pasteTargetId = null;
+      document.getElementById("pasteBar").classList.remove("show");
+      document.getElementById("pasteInput").value = "";
+      renderTable();
+    }
+
+    /** Parse text from bookmarklet or free paste */
+    function parsePasteText(text) {
+      const result = { r1: null, r7: null, e1: null, e7: null };
+      if (!text) return result;
+
+      // Pattern: Results 7d: 12345  / Engagement 7d: 67890
+      const patterns = [
+        { re: /results?\s*(?:7\s*d(?:ay)?s?|7d)?\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "r7" },
+        { re: /engagement\s*(?:7\s*d(?:ay)?s?|7d)?\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "e7" },
+        { re: /results?\s*(?:1\s*d(?:ay)?|1d)\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "r1" },
+        { re: /engagement\s*(?:1\s*d(?:ay)?|1d)\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "e1" },
+      ];
+      for (const { re, key } of patterns) {
+        const m = text.match(re);
+        if (m) result[key] = parseNum(m[1]);
+      }
+
+      // Fallback: nếu chỉ có 2 số lớn (Results + Engagement) theo thứ tự
+      if (result.r7 == null && result.e7 == null) {
+        const nums = [...text.matchAll(/([\d,.]+)\s*([KMB])?/gi)].map(m => {
+          let v = parseFloat(m[1].replace(/,/g, ""));
+          if (m[2]) {
+            const u = m[2].toUpperCase();
+            if (u === "K") v *= 1e3;
+            if (u === "M") v *= 1e6;
+            if (u === "B") v *= 1e9;
+          }
+          return Math.round(v);
+        }).filter(n => n > 0);
+
+        if (nums.length >= 2) {
+          // thường Results nhỏ hơn Engagement
+          result.r7 = Math.min(nums[0], nums[1]);
+          result.e7 = Math.max(nums[0], nums[1]);
+        } else if (nums.length === 1) {
+          result.e7 = nums[0]; // ưu tiên gắn vào Engagement 7d
+        }
+      }
+      return result;
+    }
+
+    function applyPaste() {
+      if (!pasteTargetId) return;
+      const text = document.getElementById("pasteInput").value.trim();
+      if (!text) {
+        showToast("Chưa có nội dung để dán");
+        return;
+      }
+      const parsed = parsePasteText(text);
+      const d = data[pasteTargetId];
+      let filled = 0;
+      if (parsed.r7 != null) { d.r7 = String(parsed.r7); filled++; }
+      if (parsed.e7 != null) { d.e7 = String(parsed.e7); filled++; }
+      if (parsed.r1 != null) { d.r1 = String(parsed.r1); filled++; }
+      if (parsed.e1 != null) { d.e1 = String(parsed.e1); filled++; }
+
+      if (filled === 0) {
+        showToast("Không nhận diện được số Results / Engagement");
+        return;
+      }
+
+      // auto save
+      localStorage.setItem("bl_couple_tracker_v1", JSON.stringify(data));
+      cancelPasteMode();
+      renderTable();
+      updateTimestamp(true);
+      showToast(`Đã điền ${filled} ô và lưu`);
+    }
+
+    // Events
+    document.getElementById("btnSave").addEventListener("click", saveData);
+    document.getElementById("btnRefresh").addEventListener("click", () => {
+      collectFromInputs();
+      renderTable();
+      updateTimestamp();
+      showToast("Đã sắp xếp lại bảng");
+    });
+    document.getElementById("btnApplyPaste").addEventListener("click", applyPaste);
+    document.getElementById("btnCancelPaste").addEventListener("click", cancelPasteMode);
+
+    document.getElementById("pasteInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") applyPaste();
+      if (e.key === "Escape") cancelPasteMode();
+    });
+
+    // Global paste when in paste mode
+    document.addEventListener("paste", e => {
+      if (!pasteTargetId) return;
+      // let the input receive it, then auto-apply after short delay
+      setTimeout(() => {
+        if (document.getElementById("pasteInput").value.trim()) applyPaste();
+      }, 50);
+    });
+
+    document.querySelectorAll("th.sortable").forEach(th => {
+      th.addEventListener("click", () => {
+        const col = th.dataset.col;
+        if (sortCol === col) sortDir = sortDir === "desc" ? "asc" : "desc";
+        else { sortCol = col; sortDir = "desc"; }
+        collectFromInputs();
+        renderTable();
+      });
+    });
+
+    // Init
+    loadData();
+    renderTable();
+    updateTimestamp();
+  </script>
+</body>
+</html>
