@@ -49,41 +49,7 @@
     .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
     .btn-primary:hover { filter: brightness(1.1); background: var(--accent); }
     .btn-sm { padding: 5px 9px; font-size: 0.75rem; border-radius: 6px; }
-    .btn-paste {
-      background: rgba(52, 211, 153, 0.12);
-      border-color: rgba(52, 211, 153, 0.4);
-      color: var(--green);
-    }
-    .btn-paste:hover { background: rgba(52, 211, 153, 0.22); }
-    .btn-paste.active {
-      background: var(--green); color: #0f1117; border-color: var(--green);
-    }
-    .note {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 16px; font-size: 0.85rem;
-      color: var(--muted); margin-bottom: 16px; line-height: 1.5;
-    }
-    .note strong { color: var(--orange); }
-    .paste-bar {
-      display: none;
-      background: rgba(139, 92, 246, 0.1);
-      border: 1px solid var(--accent);
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 14px;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .paste-bar.show { display: flex; }
-    .paste-bar input {
-      flex: 1; min-width: 200px;
-      padding: 8px 12px; border-radius: 8px;
-      border: 1px solid var(--border); background: #12141c;
-      color: var(--text); font-size: 0.9rem;
-    }
-    .paste-bar input:focus { outline: none; border-color: var(--accent); }
-    .paste-target-name { font-weight: 600; color: var(--accent); }
+
     .table-wrap {
       overflow: auto;
       border-radius: 12px;
@@ -91,10 +57,10 @@
       background: var(--card);
       box-shadow: 0 4px 24px rgba(0,0,0,0.25);
       -webkit-overflow-scrolling: touch;
-      max-height: calc(100vh - 200px);
+      max-height: calc(100vh - 160px);
     }
     table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 780px; }
-    thead { position: sticky; top: 0; z-index: 30; }
+    thead { position: sticky; top: 0; z-index: 40; }
     th {
       padding: 11px 12px; font-size: 0.8rem; font-weight: 600;
       text-align: center; border-bottom: 1px solid var(--border);
@@ -102,28 +68,80 @@
       background: var(--header-bg);
       position: sticky;
       top: 0;
-      z-index: 30;
+      z-index: 40;
     }
     thead tr:nth-child(2) th {
       top: 42px;
-      z-index: 29;
+      z-index: 39;
       background: var(--header-bg);
     }
     th.group { background: #12141c; color: var(--text); font-size: 0.85rem; }
-    th.couple-col { text-align: left; min-width: 190px; }
+    th.couple-col {
+      text-align: left;
+      min-width: 200px;
+      left: 0;
+      z-index: 50;
+      background: var(--header-bg);
+      box-shadow: 2px 0 6px rgba(0,0,0,0.25);
+    }
     th.sortable { cursor: pointer; user-select: none; }
     th.sortable:hover { color: var(--accent); }
     th .sort-icon { opacity: 0.35; margin-left: 3px; font-size: 0.7rem; }
     th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+
     td {
       padding: 10px 12px; border-bottom: 1px solid var(--border);
       text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem;
+      background: var(--card);
     }
     tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: rgba(139, 92, 246, 0.06); }
-    tbody tr.paste-target { background: rgba(139, 92, 246, 0.15) !important; outline: 2px solid var(--accent); }
-    td.couple { text-align: left; font-weight: 550; }
-    td.couple .hashtag { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    tbody tr:hover td { background: rgba(139, 92, 246, 0.06); }
+    td.couple {
+      text-align: left;
+      font-weight: 550;
+      position: sticky;
+      left: 0;
+      z-index: 20;
+      background: var(--card);
+      box-shadow: 2px 0 6px rgba(0,0,0,0.2);
+      min-width: 200px;
+    }
+    tbody tr:hover td.couple { background: #1e2130; }
+    td.couple .hashtag-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+    }
+    td.couple .hashtag {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+    .btn-copy-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      font-size: 0.65rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: #12141c;
+      color: var(--muted);
+      cursor: pointer;
+      line-height: 1.2;
+      transition: all 0.15s;
+    }
+    .btn-copy-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .btn-copy-tag.copied {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
     .num-input {
       width: 90px; padding: 6px 8px; border-radius: 6px;
       border: 1px solid var(--border); background: #12141c;
@@ -133,6 +151,7 @@
     .num-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
     .num-input::placeholder { color: #555; }
     .num-input.filled { border-color: rgba(52, 211, 153, 0.5); }
+
     .rank {
       display: inline-flex; align-items: center; justify-content: center;
       width: 22px; height: 22px; border-radius: 50%; font-size: 0.7rem;
@@ -142,10 +161,12 @@
     .rank.top1 { background: #fbbf24; color: #1a1a1a; }
     .rank.top2 { background: #94a3b8; color: #1a1a1a; }
     .rank.top3 { background: #cd7f32; color: #1a1a1a; }
+
     .actions { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
     .link-tw { color: var(--accent); text-decoration: none; font-size: 0.75rem; }
     .highlight-high { color: var(--green); font-weight: 600; }
     footer { margin-top: 18px; font-size: 0.8rem; color: var(--muted); text-align: center; }
+
     .toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
       background: #1a1d27; border: 1px solid var(--green); color: var(--green);
@@ -155,15 +176,16 @@
       max-width: 90vw; text-align: center;
     }
     .toast.show { opacity: 1; }
+
     @media (max-width: 640px) {
       body { padding: 12px 8px 32px; }
       h1 { font-size: 1.15rem; }
       .num-input { width: 72px; font-size: 0.85rem; padding: 5px 6px; }
       th, td { padding: 8px 6px; font-size: 0.8rem; }
-      th.couple-col { min-width: 140px; }
+      th.couple-col, td.couple { min-width: 160px; }
       .btn-sm { padding: 4px 7px; font-size: 0.7rem; }
-      .note { font-size: 0.8rem; padding: 10px 12px; }
       table { min-width: 680px; }
+      .table-wrap { max-height: calc(100vh - 130px); }
     }
   </style>
 </head>
@@ -178,19 +200,6 @@
       </div>
     </header>
 
-    <div class="note">
-      <strong>Cách dùng:</strong>
-      Bấm <b>Mở TW</b> → lấy số RESULTS + ENGAGEMENT → quay lại bấm <b>📋 Dán</b> → dán số vào.
-      Dữ liệu tự lưu trong trình duyệt. Bảng tự sắp xếp theo <strong>Engagement 7 day</strong>.
-    </div>
-
-    <div class="paste-bar" id="pasteBar">
-      <span>Dán vào: <span class="paste-target-name" id="pasteTargetName">—</span></span>
-      <input type="text" id="pasteInput" placeholder="Dán số Results / Engagement vào đây…" />
-      <button class="btn btn-sm btn-primary" id="btnApplyPaste">Áp dụng</button>
-      <button class="btn btn-sm" id="btnCancelPaste">Hủy</button>
-    </div>
-
     <div class="table-wrap">
       <table id="dataTable">
         <thead>
@@ -198,7 +207,7 @@
             <th rowspan="2" class="couple-col">Couple BL</th>
             <th colspan="2" class="group">Results</th>
             <th colspan="2" class="group">Engagement</th>
-            <th rowspan="2" style="min-width:140px">Thao tác</th>
+            <th rowspan="2" style="min-width:100px">Thao tác</th>
           </tr>
           <tr>
             <th class="sortable" data-col="r1">1 day <span class="sort-icon">▼</span></th>
@@ -231,7 +240,7 @@
     ];
     const TW_FREE = "https://www.talkwalker.com/social-media-analytics-search";
     const STORAGE_KEY = "bl_couple_tracker_v1";
-    let data = {}, sortCol = "e7", sortDir = "desc", pasteTargetId = null, saveTimer = null;
+    let data = {}, sortCol = "e7", sortDir = "desc", saveTimer = null;
 
     function parseNum(val) {
       if (val === "" || val == null) return 0;
@@ -324,9 +333,7 @@
 
       sorted.forEach((c, idx) => {
         const rankClass = idx === 0 ? "top1" : idx === 1 ? "top2" : idx === 2 ? "top3" : "";
-        const isTarget = pasteTargetId === c.id;
         const tr = document.createElement("tr");
-        if (isTarget) tr.classList.add("paste-target");
 
         const r1 = formatDisplay(data[c.id] && data[c.id].r1);
         const r7 = formatDisplay(data[c.id] && data[c.id].r7);
@@ -334,15 +341,19 @@
         const e7 = formatDisplay(data[c.id] && data[c.id].e7);
 
         tr.innerHTML =
-          '<td class="couple"><span class="rank ' + rankClass + '">' + (idx + 1) + '</span>' + c.name +
-          '<span class="hashtag">' + c.tag + '</span></td>' +
+          '<td class="couple">' +
+            '<span class="rank ' + rankClass + '">' + (idx + 1) + '</span>' + c.name +
+            '<div class="hashtag-row">' +
+              '<span class="hashtag">' + c.tag + '</span>' +
+              '<button class="btn-copy-tag" data-tag="' + c.tag + '" title="Copy hashtag">Copy</button>' +
+            '</div>' +
+          '</td>' +
           '<td><input class="num-input" id="r1_' + c.id + '" type="text" inputmode="numeric" placeholder="—" value="' + r1 + '" data-id="' + c.id + '" data-field="r1" /></td>' +
           '<td><input class="num-input" id="r7_' + c.id + '" type="text" inputmode="numeric" placeholder="—" value="' + r7 + '" data-id="' + c.id + '" data-field="r7" /></td>' +
           '<td><input class="num-input" id="e1_' + c.id + '" type="text" inputmode="numeric" placeholder="—" value="' + e1 + '" data-id="' + c.id + '" data-field="e1" /></td>' +
           '<td><input class="num-input" id="e7_' + c.id + '" type="text" inputmode="numeric" placeholder="—" value="' + e7 + '" data-id="' + c.id + '" data-field="e7" /></td>' +
           '<td><div class="actions">' +
-          '<button class="btn btn-sm btn-paste' + (isTarget ? ' active' : '') + '" data-paste="' + c.id + '">📋 Dán</button>' +
-          '<button class="btn btn-sm link-tw" data-open-tw="' + c.tag + '">Mở TW</button>' +
+            '<button class="btn btn-sm link-tw" data-open-tw="' + c.tag + '">Mở TW</button>' +
           '</div></td>';
         tbody.appendChild(tr);
       });
@@ -375,8 +386,29 @@
         });
       });
 
-      document.querySelectorAll("[data-paste]").forEach(btn => {
-        btn.addEventListener("click", () => startPasteMode(+btn.dataset.paste));
+      document.querySelectorAll(".btn-copy-tag").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tag = btn.dataset.tag;
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(tag).then(() => {
+              btn.textContent = "✓";
+              btn.classList.add("copied");
+              showToast("Đã copy " + tag);
+              setTimeout(() => {
+                btn.textContent = "Copy";
+                btn.classList.remove("copied");
+              }, 1500);
+            }).catch(() => showToast("Không copy được"));
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = tag;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            showToast("Đã copy " + tag);
+          }
+        });
       });
 
       document.querySelectorAll("[data-open-tw]").forEach(btn => {
@@ -394,77 +426,6 @@
       });
     }
 
-    function startPasteMode(id) {
-      pasteTargetId = id;
-      const couple = COUPLES.find(c => c.id === id);
-      document.getElementById("pasteTargetName").textContent = couple ? couple.name : id;
-      document.getElementById("pasteBar").classList.add("show");
-      document.getElementById("pasteInput").value = "";
-      document.getElementById("pasteInput").focus();
-      renderTable();
-    }
-
-    function cancelPasteMode() {
-      pasteTargetId = null;
-      document.getElementById("pasteBar").classList.remove("show");
-      document.getElementById("pasteInput").value = "";
-      renderTable();
-    }
-
-    function parsePasteText(text) {
-      const result = { r1: null, r7: null, e1: null, e7: null };
-      if (!text) return result;
-      const patterns = [
-        { re: /results?\s*(?:7\s*d(?:ay)?s?|7d)?\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "r7" },
-        { re: /engagement\s*(?:7\s*d(?:ay)?s?|7d)?\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "e7" },
-        { re: /results?\s*(?:1\s*d(?:ay)?|1d)\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "r1" },
-        { re: /engagement\s*(?:1\s*d(?:ay)?|1d)\s*[:=]?\s*([\d,.\s]+[KMB]?)/i, key: "e1" }
-      ];
-      patterns.forEach(p => {
-        const m = text.match(p.re);
-        if (m) result[p.key] = parseNum(m[1]);
-      });
-      if (result.r7 == null && result.e7 == null) {
-        const nums = [];
-        const re = /([\d,.]+)\s*([KMB])?/gi;
-        let m;
-        while ((m = re.exec(text)) !== null) {
-          let v = parseFloat(m[1].replace(/,/g, ""));
-          if (m[2]) {
-            const u = m[2].toUpperCase();
-            if (u === "K") v *= 1e3;
-            if (u === "M") v *= 1e6;
-            if (u === "B") v *= 1e9;
-          }
-          if (v > 0) nums.push(Math.round(v));
-        }
-        if (nums.length >= 2) {
-          result.r7 = Math.min(nums[0], nums[1]);
-          result.e7 = Math.max(nums[0], nums[1]);
-        } else if (nums.length === 1) result.e7 = nums[0];
-      }
-      return result;
-    }
-
-    function applyPaste() {
-      if (!pasteTargetId) return;
-      const text = document.getElementById("pasteInput").value.trim();
-      if (!text) { showToast("Chưa có nội dung để dán"); return; }
-      const parsed = parsePasteText(text);
-      const d = data[pasteTargetId];
-      let filled = 0;
-      if (parsed.r7 != null) { d.r7 = String(parsed.r7); filled++; }
-      if (parsed.e7 != null) { d.e7 = String(parsed.e7); filled++; }
-      if (parsed.r1 != null) { d.r1 = String(parsed.r1); filled++; }
-      if (parsed.e1 != null) { d.e1 = String(parsed.e1); filled++; }
-      if (filled === 0) { showToast("Không nhận diện được số"); return; }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      cancelPasteMode();
-      renderTable();
-      updateTimestamp(true);
-      showToast("Đã điền " + filled + " ô và lưu");
-    }
-
     document.getElementById("btnSave").addEventListener("click", () => saveData(false));
     document.getElementById("btnRefresh").addEventListener("click", () => {
       collectFromInputs();
@@ -472,18 +433,7 @@
       updateTimestamp();
       showToast("Đã sắp xếp lại bảng");
     });
-    document.getElementById("btnApplyPaste").addEventListener("click", applyPaste);
-    document.getElementById("btnCancelPaste").addEventListener("click", cancelPasteMode);
-    document.getElementById("pasteInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") applyPaste();
-      if (e.key === "Escape") cancelPasteMode();
-    });
-    document.addEventListener("paste", () => {
-      if (!pasteTargetId) return;
-      setTimeout(() => {
-        if (document.getElementById("pasteInput").value.trim()) applyPaste();
-      }, 50);
-    });
+
     document.querySelectorAll("th.sortable").forEach(th => {
       th.addEventListener("click", () => {
         const col = th.dataset.col;
@@ -493,6 +443,7 @@
         renderTable();
       });
     });
+
     window.addEventListener("beforeunload", () => {
       collectFromInputs();
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
