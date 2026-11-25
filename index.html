@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -50,17 +51,28 @@
     .btn-primary:hover { filter: brightness(1.1); background: var(--accent); }
     .btn-sm { padding: 5px 9px; font-size: 0.75rem; border-radius: 6px; }
 
+    /* Bảng không còn khung cuộn dọc riêng */
     .table-wrap {
-      overflow: auto;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: clip;
+      max-height: none;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
       -webkit-overflow-scrolling: touch;
-      max-height: calc(100vh - 160px);
     }
-    table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 780px; }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 780px;
+    }
+
     thead { position: sticky; top: 0; z-index: 40; }
+
     th {
       padding: 11px 12px; font-size: 0.8rem; font-weight: 600;
       text-align: center; border-bottom: 1px solid var(--border);
@@ -185,7 +197,11 @@
       th.couple-col, td.couple { min-width: 160px; }
       .btn-sm { padding: 4px 7px; font-size: 0.7rem; }
       table { min-width: 680px; }
-      .table-wrap { max-height: calc(100vh - 130px); }
+      .table-wrap {
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: clip;
+      }
     }
   </style>
 </head>
@@ -233,11 +249,12 @@
       { id: 6, name: "William – Est", tag: "#WilliamEst" },
       { id: 7, name: "Gemini – Fourth", tag: "#GeminiFourth" },
       { id: 8, name: "Thomas – Kong", tag: "#ThomasKong" },
-      { id: 9, name: "Au – Save", tag: "#AuauSave" },
+      { id: 9, name: "Au – Save", tag: "#AuSave" },
       { id: 10, name: "Inn – Ongsa", tag: "#InnOngsa" },
       { id: 11, name: "Zee – Nunew", tag: "#ZeeNunew" },
       { id: 12, name: "Copter – Bank", tag: "#CopterBank" }
     ];
+
     const TW_FREE = "https://www.talkwalker.com/social-media-analytics-search";
     const STORAGE_KEY = "bl_couple_tracker_v1";
     let data = {}, sortCol = "e7", sortDir = "desc", saveTimer = null;
@@ -267,6 +284,7 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) data = JSON.parse(raw);
       } catch (e) { data = {}; }
+
       COUPLES.forEach(c => {
         if (!data[c.id]) data[c.id] = { r1: "", r7: "", e1: "", e7: "" };
       });
@@ -322,6 +340,7 @@
         e1: parseNum(data[c.id] && data[c.id].e1),
         e7: parseNum(data[c.id] && data[c.id].e7)
       }));
+
       list.sort((a, b) => sortDir === "desc" ? b[sortCol] - a[sortCol] : a[sortCol] - b[sortCol]);
       return list;
     }
@@ -355,6 +374,7 @@
           '<td><div class="actions">' +
             '<button class="btn btn-sm link-tw" data-open-tw="' + c.tag + '">Mở TW</button>' +
           '</div></td>';
+
         tbody.appendChild(tr);
       });
 
@@ -368,18 +388,22 @@
 
       document.querySelectorAll(".num-input").forEach(inp => {
         if (inp.value.trim()) inp.classList.add("filled");
+
         inp.addEventListener("input", e => {
           data[e.target.dataset.id][e.target.dataset.field] = e.target.value.trim();
           e.target.classList.toggle("filled", !!e.target.value.trim());
           autoSave();
         });
+
         inp.addEventListener("change", e => {
           data[e.target.dataset.id][e.target.dataset.field] = e.target.value.trim();
           saveData(true);
         });
+
         inp.addEventListener("blur", e => {
           const field = e.target.dataset.field;
           data[e.target.dataset.id][field] = e.target.value.trim();
+
           if (field === "e7" || field === "r7") {
             setTimeout(() => { collectFromInputs(); renderTable(); }, 80);
           }
@@ -389,11 +413,13 @@
       document.querySelectorAll(".btn-copy-tag").forEach(btn => {
         btn.addEventListener("click", () => {
           const tag = btn.dataset.tag;
+
           if (navigator.clipboard) {
             navigator.clipboard.writeText(tag).then(() => {
               btn.textContent = "✓";
               btn.classList.add("copied");
               showToast("Đã copy " + tag);
+
               setTimeout(() => {
                 btn.textContent = "Copy";
                 btn.classList.remove("copied");
@@ -414,9 +440,11 @@
       document.querySelectorAll("[data-open-tw]").forEach(btn => {
         btn.addEventListener("click", () => {
           const tag = btn.dataset.openTw;
+
           if (navigator.clipboard) {
             navigator.clipboard.writeText(tag).then(() => showToast("Đã copy " + tag)).catch(() => {});
           }
+
           window.open(TW_FREE, "_blank");
         });
       });
@@ -427,6 +455,7 @@
     }
 
     document.getElementById("btnSave").addEventListener("click", () => saveData(false));
+
     document.getElementById("btnRefresh").addEventListener("click", () => {
       collectFromInputs();
       renderTable();
@@ -437,8 +466,10 @@
     document.querySelectorAll("th.sortable").forEach(th => {
       th.addEventListener("click", () => {
         const col = th.dataset.col;
+
         if (sortCol === col) sortDir = sortDir === "desc" ? "asc" : "desc";
         else { sortCol = col; sortDir = "desc"; }
+
         collectFromInputs();
         renderTable();
       });
@@ -456,3 +487,4 @@
   </script>
 </body>
 </html>
+
